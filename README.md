@@ -1,3 +1,3 @@
-Devops-quest:
+**_Devops-quest:**_
 
-Mon projet de /033[1mcodage/033[0m pour mon /033[1mstage d'observation/033[0m de 3ème
+Mon projet de _codage_ pour mon _stage d'observation_ de 3ème.
