@@ -20,8 +20,8 @@ function update() {
 
 document.getElementById("btnQuest").addEventListener("click", () => {
   xp += 10;
-  log("Quête terminée ✅ (+10 XP)");
-  if (xp % 50 === 0) {
+  log("Mission réussie ✅ (+10 XP)");
+if (xp % 30 === 0) {
     level += 1;
     log(`Level Up! 🎉 (Level ${level})`);
   }
