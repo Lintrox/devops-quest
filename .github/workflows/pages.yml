@@ -1,18 +1,32 @@
-name: deploy pages
+name: Je déploie mon site avec Github Pages
 
-on: 
+on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: docker build
-        run: docker build -t devops-quest:${{ github.sha }} .
-      - name: docker run
-        run: docker run -p 1234:80 devops-quest:${{ github.sha }}
 
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: src
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
