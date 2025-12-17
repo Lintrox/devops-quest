@@ -14,5 +14,5 @@ jobs:
       - name: docker build
         run: docker build -t devops-quest:${{ github.sha }} .
       - name: docker run
-        run: docker run -p 8080:80 devops-quest:${{ github.sha }}
+        run: docker run -p 1234:80 devops-quest:${{ github.sha }}
 
