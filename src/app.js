@@ -40,3 +40,10 @@ document.getElementById("btnDeploy").addEventListener("click", async () => {
 buildEl.textContent = `Build: ${window.BUILD_ID || "local"}`;
 log("Jeu chargé. Prêt à automatiser.");
 update();
+
+document.getElementById("btnSpecialQuest").addEventListener("click", () => {
+  log("Quête spéciale ✅ (+50 XP)");
+  xp += 50;
+  log(`waouw! Tu es un vrai padawan SRE! (level ${level})`);
+  update();
+});
