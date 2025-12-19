@@ -114,7 +114,7 @@ if (!canvas) {
 }
 
 // Lorsque le joueur monte de niveau, on augmente aussi son rayon
-const originalLevelUp = player.speed + 0.4; // pour repère, mais on changera dans le code plus haut
+const originalLevelUp = player.r + 2; // pour repère, mais on changera dans le code plus haut
 
 // Tu dois chercher dans le code existant là où il y a `if (state.score % 50 === 0)` (dans la fonction update).
 // Ajoute dedans après l'augmentation de level :
