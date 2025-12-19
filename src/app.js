@@ -290,8 +290,7 @@ if (!canvas) {
     function loop(nowMs) {
       update(nowMs);
 
-      // Refresh timer UI (max 10 fois/sec)
-      if (started && !gameOver && nowMs - (lastUiUpdateMs ?? 0) > 100) {
+      if (started && !gameOver) {
         updateTime(nowMs);
         lastUiUpdateMs = nowMs;
       }
