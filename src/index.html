@@ -1,22 +1,40 @@
-<main class="screen">
-  <header class="hud">
-    <div class="title">🎮 DevOps Quest</div>
-    <div class="stats">
-      <span id="score">Score: 0</span>
-      <span id="level">Level: 1</span>
-      <span id="build">Build: local</span>
-    </div>
-  </header>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DevOps Quest</title>
 
-  <section class="panel">
-    <p>ZQSD / Flèches pour bouger. Ramasse les étoiles ⭐</p>
-    <canvas id="game" width="800" height="450"></canvas>
-    <div class="log" id="log"></div>
-  </section>
+  <!-- CSS -->
+  <link rel="stylesheet" href="./styles.css" />
 
-  <footer class="footer">
-    Objectif : automatiser le monde… et ramasser des points.
-  </footer>
-</main>
+  <!-- Favicon emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+</head>
 
-<script src="./app.js"></script>
+<body>
+  <main class="screen">
+    <header class="hud">
+      <div class="title">🎮 DevOps Quest</div>
+      <div class="stats">
+        <span id="score">Score: 0</span>
+        <span id="level">Level: 1</span>
+        <span id="build">Build: local</span>
+      </div>
+    </header>
+
+    <section class="panel">
+      <p>ZQSD / Flèches pour bouger. Ramasse les étoiles ⭐</p>
+      <canvas id="game" width="800" height="450"></canvas>
+      <div class="log" id="log"></div>
+    </section>
+
+    <footer class="footer">
+      Objectif : automatiser le monde… et ramasser des points.
+    </footer>
+  </main>
+
+  <!-- JS -->
+  <script src="./app.js"></script>
+</body>
+</html>
