@@ -2,7 +2,7 @@ const canvas = document.getElementById("game");
 const logEl = document.getElementById("log");
 const levelEl = document.getElementById("level");
 const timeEl = document.getElementById("time");
-const buildEl = document.getElementById("build");
+const startBtn = document.getElementById("start-btn");
 
 function log(msg) {
   if (!logEl) return;
@@ -21,9 +21,6 @@ if (!canvas) {
     console.error("Impossible d'obtenir le contexte 2D");
     log("❌ Contexte 2D introuvable");
   } else {
-    // HUD build
-    if (buildEl) buildEl.textContent = `Build: ${window.BUILD_ID || "local"}`;
-
     // Inputs
     const keys = new Set();
     window.addEventListener("keydown", (e) => keys.add(e.key.toLowerCase()));
@@ -43,12 +40,14 @@ if (!canvas) {
     let star = spawnStar();
     let touchingEdge = false;
     let edgeFlashTimeout = null;
+    let started = false;
 
     // Timer par niveau
     let gameStartMs = performance.now();
     let levelStartMs = gameStartMs;
     let lastUiUpdateMs = 0;
     let bestLevelTimeSec = null;
+    let bestLevelNumber = null;
     let gameOver = false;
 
     function spawnStar() {
@@ -84,10 +83,10 @@ if (!canvas) {
       levelStartMs = ts;
       gameStartMs = ts;
       bestLevelTimeSec = null;
+      bestLevelNumber = null;
       gameOver = false;
       updateHUD();
       updateTime(ts);
-      log("↩️ Bord touché : retour au niveau 1");
     }
 
     function flashEdgeBorder() {
@@ -102,14 +101,15 @@ if (!canvas) {
     function finishGame(nowMs) {
       gameOver = true;
       const finalTimeSec = (nowMs - gameStartMs) / 1000;
-      const best = bestLevelTimeSec === null ? null : bestLevelTimeSec.toFixed(2);
-      const bestText = best ? `${best}s` : "N/A";
-      log(`🏁 Fin du jeu ! Temps final: ${finalTimeSec.toFixed(2)}s | Niveau le plus rapide: ${bestText}`);
-      if (timeEl) timeEl.textContent = `Temps final: ${finalTimeSec.toFixed(2)}s (lvl le + rapide: ${bestText})`;
+      const bestTime = bestLevelTimeSec === null ? null : bestLevelTimeSec.toFixed(2);
+      const bestText =
+        bestTime && bestLevelNumber ? `Niveau ${bestLevelNumber} en ${bestTime}s` : "Aucun niveau chronométré";
+      log(`🏁 Fin du jeu ! Temps final: ${finalTimeSec.toFixed(2)}s | ${bestText}`);
+      if (timeEl) timeEl.textContent = `Temps final: ${finalTimeSec.toFixed(2)}s`;
     }
 
     function update(nowMs) {
-      if (gameOver) return;
+      if (!started || gameOver) return;
 
       const up = keys.has("arrowup") || keys.has("z");
       const down = keys.has("arrowdown") || keys.has("s");
@@ -144,11 +144,13 @@ if (!canvas) {
         // Level up toutes les 50 points
         if (state.score % 50 === 0 && state.level < MAX_LEVEL) {
           const levelTimeSec = (nowMs - levelStartMs) / 1000;
+          const completedLevel = state.level;
 
           bestLevelTimeSec =
             bestLevelTimeSec === null
               ? levelTimeSec
               : Math.min(bestLevelTimeSec, levelTimeSec);
+          if (bestLevelTimeSec === levelTimeSec) bestLevelNumber = completedLevel;
 
           const nextLevel = Math.min(MAX_LEVEL, state.level + 1);
           state.level = nextLevel;
@@ -194,13 +196,14 @@ if (!canvas) {
 
       ctx.fillStyle = "rgba(255,255,255,0.75)";
       ctx.font = "14px monospace";
+      ctx.fillText("Utilise les flèches pour te déplacer", 14, canvas.height - 14);
     }
 
     function loop(nowMs) {
       update(nowMs);
 
       // Refresh timer UI (max 10 fois/sec)
-      if (!gameOver && nowMs - lastUiUpdateMs > 100) {
+      if (started && !gameOver && nowMs - lastUiUpdateMs > 100) {
         updateTime(nowMs);
         lastUiUpdateMs = nowMs;
       }
@@ -209,8 +212,37 @@ if (!canvas) {
       requestAnimationFrame(loop);
     }
 
+    function startGame() {
+      const now = performance.now();
+      state.score = 0;
+      state.level = 1;
+      player.x = 80;
+      player.y = 80;
+      player.speed = BASE_PLAYER_SPEED;
+      starRadius = BASE_STAR_RADIUS;
+      star = spawnStar();
+      touchingEdge = false;
+      if (edgeFlashTimeout) {
+        clearTimeout(edgeFlashTimeout);
+        edgeFlashTimeout = null;
+      }
+      canvas.classList.remove("edge-flash");
+      gameStartMs = now;
+      levelStartMs = now;
+      lastUiUpdateMs = now;
+      bestLevelTimeSec = null;
+      bestLevelNumber = null;
+      gameOver = false;
+      started = true;
+      updateHUD();
+      updateTime(now);
+      log("▶️ Start !");
+    }
+
+    if (startBtn) startBtn.addEventListener("click", startGame);
+
     updateHUD();
-    log("✅ Jeu lancé.");
+    log("✅ Prêt. Appuie sur Start pour lancer.");
     loop();
   }
 }
