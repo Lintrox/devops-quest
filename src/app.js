@@ -1,11 +1,12 @@
-let xp = 0;
-let level = 1;
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
 const logEl = document.getElementById("log");
-const xpEl = document.getElementById("xp");
+const scoreEl = document.getElementById("score");
 const levelEl = document.getElementById("level");
 const buildEl = document.getElementById("build");
-const btnSpecialQuestEl = document.getElementById("btnSpecialQuest");
+
+buildEl.textContent = `Build: ${window.BUILD_ID || "local"}`;
 
 function log(msg) {
   const line = document.createElement("div");
@@ -14,61 +15,110 @@ function log(msg) {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
-function update() {
-  xpEl.textContent = `XP: ${xp}`;
-  levelEl.textContent = `Level: ${level}`;
-  
-  // Désactiver le bouton Special Quest à partir du niveau 3
-  if (level >= 3) {
-    btnSpecialQuestEl.disabled = true;
-    btnSpecialQuestEl.style.opacity = "0.5";
-    btnSpecialQuestEl.style.cursor = "not-allowed";
-  }
-  
-  // Changer la couleur de fond en fonction du niveau
-  if (level += 1) {
-    document.body.style.backgroundColor = "#1a1a2e"
-    document.body.style.color = "#e8f0ff"
-  } else if (level % 2 === 0) {
-    document.body.style.backgroundColor = "#16213e"
-    log('waouw! Quel niveau!');
-  } else if (level % 3 === 0) {
-    document.body.style.backgroundColor = "#0f3460"
-    log("Incroyable!");
-  } else if (level % 4 === 0) {
-    document.body.style.backgroundColor = "#533483"
-    log('après je trouve que c est quand même aberrant de try-hard un jeu comme ça quoi mais oklm');
-  }
+const keys = new Set();
 
-    
+window.addEventListener("keydown", (e) => {
+  keys.add(e.key.toLowerCase());
+});
+window.addEventListener("keyup", (e) => {
+  keys.delete(e.key.toLowerCase());
+});
+
+const state = {
+  score: 0,
+  level: 1,
+};
+
+const player = {
+  x: 60,
+  y: 60,
+  r: 14,
+  speed: 3.2,
+};
+
+let star = spawnStar();
+
+function spawnStar() {
+  // spawn within bounds
+  const padding = 30;
+  return {
+    x: padding + Math.random() * (canvas.width - 2 * padding),
+    y: padding + Math.random() * (canvas.height - 2 * padding),
+    r: 10,
+  };
 }
 
-document.getElementById("btnQuest").addEventListener("click", () => {
-  xp += 10;
-  log("Mission réussie ✅ (+10 XP)");
-if (xp % 30 === 0) {
-    level += 1;
-    log(`Level Up! 🎉 (Level ${level})`);
+function dist(a, b) {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function updateHUD() {
+  scoreEl.textContent = `Score: ${state.score}`;
+  levelEl.textContent = `Level: ${state.level}`;
+}
+
+function update() {
+  // Controls: arrows or ZQSD
+  const up = keys.has("arrowup") || keys.has("z");
+  const down = keys.has("arrowdown") || keys.has("s");
+  const left = keys.has("arrowleft") || keys.has("q");
+  const right = keys.has("arrowright") || keys.has("d");
+
+  if (up) player.y -= player.speed;
+  if (down) player.y += player.speed;
+  if (left) player.x -= player.speed;
+  if (right) player.x += player.speed;
+
+  // Clamp to canvas
+  player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x));
+  player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y));
+
+  // Collision player-star
+  if (dist(player, star) < player.r + star.r) {
+    state.score += 10;
+    log("⭐ Étoile ramassée (+10)");
+    star = spawnStar();
+
+    if (state.score % 50 === 0) {
+      state.level += 1;
+      player.speed += 0.4;
+      log(`🎉 Level Up! Niveau ${state.level} (vitesse +)`);
+    }
+    updateHUD();
   }
-  update();
-});
-document.getElementById("btnDeploy").addEventListener("click", async () => {
-  log("Déploiement simulé… ⚙️");
-  await new Promise(r => setTimeout(r, 600));
-  level += 1;
-  log(`Déploiement OK 🚀 → Level ${level}`);
-  update();
-});
+}
 
-// Affiche une “version build” via variable d'env injectée (optionnel)
-buildEl.textContent = `Build: ${window.BUILD_ID || "local"}`;
-log("Jeu chargé. Prêt à automatiser.");
-update();
+function draw() {
+  // background
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-document.getElementById("btnSpecialQuest").addEventListener("click", () => {
-  log("Quête spéciale ✅ (+50 XP)");
-  xp += 50;
-  level += 1;
-  log(`waouw! Tu es un vrai padawan SRE! (level ${level})`);
+  // star
+  ctx.beginPath();
+  ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+  ctx.fillStyle = "#ffd166";
+  ctx.fill();
+
+  // player
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+  ctx.fillStyle = "#4cc9f0";
+  ctx.fill();
+
+  // small “shadow” text
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.font = "14px monospace";
+  ctx.fillText("Attrape ⭐ pour gagner des points", 14, canvas.height - 14);
+}
+
+function loop() {
   update();
-});
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Start
+updateHUD();
+log("Jeu lancé. Déplace-toi avec ZQSD / flèches.");
+loop();
