@@ -2,6 +2,7 @@ const canvas = document.getElementById("game");
 const logEl = document.getElementById("log");
 const scoreEl = document.getElementById("score");
 const levelEl = document.getElementById("level");
+const timeEl = document.getElementById("time");
 const buildEl = document.getElementById("build");
 
 function log(msg) {
@@ -21,17 +22,23 @@ if (!canvas) {
     console.error("Impossible d'obtenir le contexte 2D");
     log("❌ Contexte 2D introuvable");
   } else {
-    // HUD
+    // HUD build
     if (buildEl) buildEl.textContent = `Build: ${window.BUILD_ID || "local"}`;
 
+    // Inputs
     const keys = new Set();
     window.addEventListener("keydown", (e) => keys.add(e.key.toLowerCase()));
     window.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
 
+    // Game state
     const state = { score: 0, level: 1 };
 
     const player = { x: 80, y: 80, r: 14, speed: 3.2 };
     let star = spawnStar();
+
+    // Timer par niveau
+    let levelStartMs = performance.now();
+    let lastUiUpdateMs = 0;
 
     function spawnStar() {
       const padding = 30;
@@ -53,7 +60,12 @@ if (!canvas) {
       if (levelEl) levelEl.textContent = `Level: ${state.level}`;
     }
 
-    function update() {
+    function updateTime(nowMs) {
+      const elapsedSec = (nowMs - levelStartMs) / 1000;
+      if (timeEl) timeEl.textContent = `Time: ${elapsedSec.toFixed(1)}s`;
+    }
+
+    function update(nowMs) {
       const up = keys.has("arrowup") || keys.has("z");
       const down = keys.has("arrowdown") || keys.has("s");
       const left = keys.has("arrowleft") || keys.has("q");
@@ -67,15 +79,25 @@ if (!canvas) {
       player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x));
       player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y));
 
+      // Collision joueur-étoile
       if (dist(player, star) < player.r + star.r) {
         state.score += 10;
+        log("⭐ Étoile ramassée (+10)");
         star = spawnStar();
 
+        // Level up toutes les 50 points
         if (state.score % 50 === 0) {
+          const levelTimeSec = (nowMs - levelStartMs) / 1000;
+
           state.level += 1;
           player.speed += 0.4;
-          log(`🎉 Level Up! Niveau ${state.level}`);
+
+          log(`🎉 Level Up! Niveau ${state.level} (temps: ${levelTimeSec.toFixed(2)}s)`);
+
+          // reset chrono pour le niveau suivant
+          levelStartMs = nowMs;
         }
+
         updateHUD();
       }
     }
@@ -97,41 +119,24 @@ if (!canvas) {
 
       ctx.fillStyle = "rgba(255,255,255,0.75)";
       ctx.font = "14px monospace";
-      ctx.fillText("Utilise les flèches", 14, canvas.height - 14);
+      ctx.fillText("Bouge avec ZQSD / flèches", 14, canvas.height - 14);
     }
 
-    function loop() {
-      update();
+    function loop(nowMs) {
+      update(nowMs);
+
+      // Refresh timer UI (max 10 fois/sec)
+      if (nowMs - lastUiUpdateMs > 100) {
+        updateTime(nowMs);
+        lastUiUpdateMs = nowMs;
+      }
+
       draw();
       requestAnimationFrame(loop);
     }
 
     updateHUD();
-    log("✅ Jeu lancé.");
-    loop();
+    log("✅ Jeu lancé. Bouge avec ZQSD / flèches.");
+    requestAnimationFrame(loop);
   }
 }
-
-// Lorsque le joueur monte de niveau, on augmente aussi son rayon
-const originalLevelUp = player.r + 1000; // pour repère, mais on changera dans le code plus haut
-
-// Tu dois chercher dans le code existant là où il y a `if (state.score % 50 === 0)` (dans la fonction update).
-// Ajoute dedans après l'augmentation de level :
-      // Par exemple : 
-      // player.speed += 0.4;
-      // player.r += 2; // <- AJOUTE cette ligne pour agrandir le joueur à chaque niveau (2 px en plus à chaque fois)
-      // log(`🎉 Level Up! Niveau ${state.level}`);
-
-
-// Ou si tu veux juste une version patch à ajouter ici
-// — version qui intercepte l'augmentation de niveau (si tu peux modifier la fonction update) :
-
-/*
-Remarque :  
-Si tu ne peux pas modifier dans la boucle du jeu, alors ce patch n'a d'effet que si réutilisé dans la logique principale.  
-Mais le vrai changement doit être :  
-      player.speed += 0.4;
-      player.r += 2; // <--- AJOUTE cette ligne
-      log(`🎉 Level Up! Niveau ${state.level}`);
-*/
-
