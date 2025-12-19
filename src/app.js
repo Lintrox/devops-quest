@@ -14,19 +14,6 @@ function log(msg) {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
-// Messages différents selon le niveau atteint
-function getLevelUpMessage(newLevel) {
-  const messages = {
-    2: "Bravo ! Tu commences à maîtriser les bases ! 🌱",
-    3: "Excellent ! Tu es maintenant un apprenti DevOps ! 🚀",
-    4: "Impressionnant ! Tu deviens expert en automatisation ! ⚡",
-    5: "Incroyable ! Tu es un vrai maître DevOps ! 🏆",
-    6: "Légendaire ! Plus rien ne t'arrête ! 🌟",
-    7: "Tu as atteint le niveau ultime ! Tu es une légende SRE ! 👑"
-  };
-  return messages[newLevel] || `Level Up! Niveau ${newLevel} atteint ! 🎉`;
-}
-
 function update() {
   xpEl.textContent = `XP: ${xp}`;
   levelEl.textContent = `Level: ${level}`;
@@ -39,16 +26,17 @@ function update() {
   }
   
   // Changer la couleur de fond en fonction du niveau
-  if (level === 1) {
+  if (level += 1) {
     document.body.style.backgroundColor = "#1a1a2e";
-  } else if (level === 2) {
-    document.body.style.backgroundColor = "#16213e";
-  } else if (level === 3) {
-    document.body.style.backgroundColor = "#0f3460";
-  } else if (level === 4) {
-    document.body.style.backgroundColor = "#533483";
-  } else if (level >= 5) {
-    document.body.style.backgroundColor = "#2d1b4e";
+  } else if (level % 2 === 0) {
+    document.body.style.backgroundColor = "#16213e"
+    log('waouw! Quel niveau!');
+  } else if (level % 3 === 0) {
+    document.body.style.backgroundColor = "#0f3460"
+    log("Incroyable!");
+  } else if (level % 4 === 0) {
+    document.body.style.backgroundColor = "#533483"
+    log('après je trouve que c est quand même aberrant de try-hard un jeu comme ça quoi mais oklm');
   }
 
     
@@ -57,9 +45,9 @@ function update() {
 document.getElementById("btnQuest").addEventListener("click", () => {
   xp += 10;
   log("Mission réussie ✅ (+10 XP)");
-  if (xp % 30 === 0) {
+if (xp % 30 === 0) {
     level += 1;
-    log(getLevelUpMessage(level));
+    log(`Level Up! 🎉 (Level ${level})`);
   }
   update();
 });
@@ -68,8 +56,7 @@ document.getElementById("btnDeploy").addEventListener("click", async () => {
   log("Déploiement simulé… ⚙️");
   await new Promise(r => setTimeout(r, 600));
   level += 1;
-  log(`Déploiement OK 🚀`);
-  log(getLevelUpMessage(level));
+  log(`Déploiement OK 🚀 → Level ${level}`);
   update();
 });
 
@@ -82,6 +69,6 @@ document.getElementById("btnSpecialQuest").addEventListener("click", () => {
   log("Quête spéciale ✅ (+50 XP)");
   xp += 50;
   level += 1;
-  log(getLevelUpMessage(level));
+  log(`waouw! Tu es un vrai padawan SRE! (level ${level})`);
   update();
 });
