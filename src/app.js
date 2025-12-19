@@ -1,25 +1,16 @@
 const canvas = document.getElementById("game");
-const logEl = document.getElementById("log");
 const levelEl = document.getElementById("level");
 const timeEl = document.getElementById("time");
 const startBtn = document.getElementById("start-btn");
 
-function log(msg) {
-  if (!logEl) return;
-  const line = document.createElement("div");
-  line.textContent = `> ${msg}`;
-  logEl.appendChild(line);
-  logEl.scrollTop = logEl.scrollHeight;
-}
+function log() {} // logging désactivé (zone log supprimée)
 
 if (!canvas) {
   console.error("Canvas #game introuvable");
-  log("❌ Canvas introuvable (#game). Vérifie index.html");
 } else {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     console.error("Impossible d'obtenir le contexte 2D");
-    log("❌ Contexte 2D introuvable");
   } else {
     // Inputs
     const keys = new Set();
@@ -41,6 +32,7 @@ if (!canvas) {
     let touchingEdge = false;
     let edgeFlashTimeout = null;
     let started = false;
+    let levelFlashTimeout = null;
 
     // Timer par niveau
     let gameStartMs = null;
@@ -105,6 +97,18 @@ if (!canvas) {
       if (levelEl) levelEl.textContent = `Level: ${state.level}`;
     }
 
+    function flashLevel() {
+      if (!levelEl) return;
+      levelEl.classList.remove("level-flash");
+      void levelEl.offsetWidth; // force reflow to restart animation
+      levelEl.classList.add("level-flash");
+      if (levelFlashTimeout) clearTimeout(levelFlashTimeout);
+      levelFlashTimeout = window.setTimeout(() => {
+        levelEl.classList.remove("level-flash");
+        levelFlashTimeout = null;
+      }, 600);
+    }
+
     function updateTime(nowMs) {
       if (!started || levelStartMs === null) return;
       const elapsedSec = (nowMs - levelStartMs) / 1000;
@@ -141,7 +145,6 @@ if (!canvas) {
       const bestTime = bestLevelTimeSec === null ? null : bestLevelTimeSec.toFixed(2);
       const bestText =
         bestTime && bestLevelNumber ? `Niveau ${bestLevelNumber} en ${bestTime}s` : "Aucun niveau chronométré";
-      log(`🏁 Fin du jeu ! Temps final: ${finalTimeSec.toFixed(2)}s | ${bestText}`);
       if (timeEl) timeEl.textContent = `Temps final: ${finalTimeSec.toFixed(2)}s`;
     }
 
@@ -195,10 +198,9 @@ if (!canvas) {
           if (state.level % 2 === 0 && starRadius > MIN_STAR_RADIUS) {
             starRadius = Math.max(MIN_STAR_RADIUS, starRadius - STAR_SHRINK_STEP);
             star.r = starRadius;
-            log(`✨ Niveau ${state.level}: étoile rétrécie`);
           }
 
-          log(`🎉 Level Up! Niveau ${state.level} (temps: ${levelTimeSec.toFixed(2)}s)`);
+          flashLevel();
 
           if (state.level === MAX_LEVEL) {
             updateHUD();
@@ -243,8 +245,13 @@ if (!canvas) {
       requestAnimationFrame(loop);
     }
 
-    function startGame() {
-      const now = performance.now();
+    function setButtonRunning(isRunning) {
+      if (!startBtn) return;
+      startBtn.textContent = isRunning ? "Stop" : "Start";
+      startBtn.classList.toggle("stop", isRunning);
+    }
+
+    function resetToIdle() {
       state.score = 0;
       state.level = 1;
       player.x = 80;
@@ -258,23 +265,43 @@ if (!canvas) {
         edgeFlashTimeout = null;
       }
       canvas.classList.remove("edge-flash");
-      gameStartMs = now;
-      levelStartMs = now;
-      lastUiUpdateMs = now;
+      gameStartMs = null;
+      levelStartMs = null;
+      lastUiUpdateMs = null;
       bestLevelTimeSec = null;
       bestLevelNumber = null;
       gameOver = false;
-      started = true;
+      started = false;
+      setButtonRunning(false);
       updateHUD();
-      updateTime(now);
-      log("▶️ Start !");
+      if (timeEl) timeEl.textContent = "Time: 0.0s";
     }
 
-    if (startBtn) startBtn.addEventListener("click", startGame);
+    function startGame() {
+      const now = performance.now();
+      resetToIdle();
+      gameStartMs = now;
+      levelStartMs = now;
+      lastUiUpdateMs = now;
+      started = true;
+      setButtonRunning(true);
+      updateHUD();
+      updateTime(now);
+    }
+
+    function toggleStart() {
+      if (!started) {
+        startGame();
+      } else {
+        resetToIdle();
+      }
+    }
+
+    if (startBtn) startBtn.addEventListener("click", toggleStart);
 
     updateHUD();
     if (timeEl) timeEl.textContent = "Time: 0.0s";
-    log("✅ Prêt. Appuie sur Start pour lancer.");
+    setButtonRunning(false);
     loop();
   }
 }
