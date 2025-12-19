@@ -15,11 +15,16 @@ if (!canvas) {
   } else {
     // Inputs
     const keys = new Set();
-    window.addEventListener("keydown", (e) => keys.add(e.key.toLowerCase()));
+    window.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+      keys.add(key);
+      handleCheatInput(key);
+    });
     window.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
 
     // Game state
     const state = { score: 0, level: 1 };
+    let cheatBuffer = "";
 
     const BASE_PLAYER_SPEED = 3.2;
     const BASE_STAR_RADIUS = 10;
@@ -165,6 +170,17 @@ if (!canvas) {
         levelEl.classList.remove(upClass, downClass);
         levelFlashTimeout = null;
       }, 900);
+    }
+
+    function handleCheatInput(key) {
+      if (!started || gameOver) return;
+      if (key.length !== 1 || !/[a-z]/.test(key)) return;
+      cheatBuffer = (cheatBuffer + key).slice(-8);
+      if (cheatBuffer.endsWith("mael")) {
+        state.level = MAX_LEVEL;
+        updateHUD();
+        finishGame(performance.now());
+      }
     }
 
     function updateTime(nowMs) {
@@ -347,6 +363,7 @@ if (!canvas) {
       bestLevelNumber = null;
       gameOver = false;
       started = false;
+      cheatBuffer = "";
       setButtonRunning(false);
       setShareVisible(false);
       updateHUD();
