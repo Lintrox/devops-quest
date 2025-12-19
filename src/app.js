@@ -146,7 +146,7 @@ if (!canvas) {
     }
 
     function updateHUD() {
-      if (levelEl) levelEl.textContent = `Level: ${state.level}`;
+      if (levelEl) levelEl.textContent = `Level: ${state.level}/${MAX_LEVEL}`;
     }
 
     function flashLevel(direction) {
