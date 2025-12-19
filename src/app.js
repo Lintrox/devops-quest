@@ -36,7 +36,9 @@ if (!canvas) {
     const BASE_PLAYER_SPEED = 3.2;
     const BASE_STAR_RADIUS = 10;
     const STAR_SHRINK_STEP = 2;
+    const STAR_GROW_STEP = 2;
     const MIN_STAR_RADIUS = 4;
+    const MAX_STAR_RADIUS = 22;
     let starRadius = BASE_STAR_RADIUS;
     const player = { x: 80, y: 80, r: 14, speed: BASE_PLAYER_SPEED };
     let star = spawnStar();
@@ -124,6 +126,10 @@ if (!canvas) {
             starRadius = Math.max(MIN_STAR_RADIUS, starRadius - STAR_SHRINK_STEP);
             star.r = starRadius;
             log(`✨ Niveau ${state.level}: étoile rétrécie`);
+          } else if (state.level % 2 === 0 && starRadius < MAX_STAR_RADIUS) {
+            starRadius = Math.min(MAX_STAR_RADIUS, starRadius + STAR_GROW_STEP);
+            star.r = starRadius;
+            log(`🔆 Niveau ${state.level}: étoile agrandie`);
           }
 
           log(`🎉 Level Up! Niveau ${state.level} (temps: ${levelTimeSec.toFixed(2)}s)`);
