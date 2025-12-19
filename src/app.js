@@ -107,7 +107,7 @@ if (!canvas) {
     }
 
     updateHUD();
-    log("✅ Jeu lancé. Bouge avec ZQSD / flèches.");
+    log("✅ Jeu lancé. Déplace toi avec les flèches.");
     loop();
   }
 }
