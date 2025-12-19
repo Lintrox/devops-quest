@@ -35,18 +35,20 @@ if (!canvas) {
 
     const BASE_PLAYER_SPEED = 3.2;
     const BASE_STAR_RADIUS = 10;
-    const STAR_SHRINK_STEP = 8;
-    const STAR_GROW_STEP = 2;
+    const STAR_SHRINK_STEP = 4;
     const MIN_STAR_RADIUS = 4;
-    const MAX_STAR_RADIUS = 22;
+    const MAX_LEVEL = 10;
     let starRadius = BASE_STAR_RADIUS;
     const player = { x: 80, y: 80, r: 14, speed: BASE_PLAYER_SPEED };
     let star = spawnStar();
     let touchingEdge = false;
 
     // Timer par niveau
-    let levelStartMs = performance.now();
+    let gameStartMs = performance.now();
+    let levelStartMs = gameStartMs;
     let lastUiUpdateMs = 0;
+    let bestLevelTimeSec = null;
+    let gameOver = false;
 
     function spawnStar() {
       const padding = 30;
@@ -80,12 +82,26 @@ if (!canvas) {
       starRadius = BASE_STAR_RADIUS;
       star.r = starRadius;
       levelStartMs = ts;
+      gameStartMs = ts;
+      bestLevelTimeSec = null;
+      gameOver = false;
       updateHUD();
       updateTime(ts);
       log("↩️ Bord touché : retour au niveau 1");
     }
 
+    function finishGame(nowMs) {
+      gameOver = true;
+      const finalTimeSec = (nowMs - gameStartMs) / 1000;
+      const best = bestLevelTimeSec === null ? null : bestLevelTimeSec.toFixed(2);
+      const bestText = best ? `${best}s` : "N/A";
+      log(`🏁 Fin du jeu ! Temps final: ${finalTimeSec.toFixed(2)}s | Niveau le plus rapide: ${bestText}`);
+      if (timeEl) timeEl.textContent = `Temps final: ${finalTimeSec.toFixed(2)}s (lvl le + rapide: ${bestText})`;
+    }
+
     function update(nowMs) {
+      if (gameOver) return;
+
       const up = keys.has("arrowup") || keys.has("z");
       const down = keys.has("arrowdown") || keys.has("s");
       const left = keys.has("arrowleft") || keys.has("q");
@@ -116,23 +132,32 @@ if (!canvas) {
         star = spawnStar();
 
         // Level up toutes les 50 points
-        if (state.score % 50 === 0) {
+        if (state.score % 50 === 0 && state.level < MAX_LEVEL) {
           const levelTimeSec = (nowMs - levelStartMs) / 1000;
 
-          state.level += 1;
-          player.speed += 0.4;
+          bestLevelTimeSec =
+            bestLevelTimeSec === null
+              ? levelTimeSec
+              : Math.min(bestLevelTimeSec, levelTimeSec);
 
-          if (state.level % 10 === 0 && starRadius > MIN_STAR_RADIUS) {
+          const nextLevel = Math.min(MAX_LEVEL, state.level + 1);
+          state.level = nextLevel;
+
+          if (state.level % 2 === 0 && starRadius > MIN_STAR_RADIUS) {
             starRadius = Math.max(MIN_STAR_RADIUS, starRadius - STAR_SHRINK_STEP);
             star.r = starRadius;
             log(`✨ Niveau ${state.level}: étoile rétrécie`);
-          } else if (state.level % 2 === 0 && starRadius < MAX_STAR_RADIUS) {
-            starRadius = Math.min(MAX_STAR_RADIUS, starRadius + STAR_GROW_STEP);
-            star.r = starRadius;
-            log(`🔆 Niveau ${state.level}: étoile agrandie`);
           }
 
           log(`🎉 Level Up! Niveau ${state.level} (temps: ${levelTimeSec.toFixed(2)}s)`);
+
+          if (state.level === MAX_LEVEL) {
+            updateHUD();
+            finishGame(nowMs);
+            return;
+          }
+
+          player.speed += 0.4;
 
           // reset chrono pour le niveau suivant
           levelStartMs = nowMs;
@@ -166,7 +191,7 @@ if (!canvas) {
       update(nowMs);
 
       // Refresh timer UI (max 10 fois/sec)
-      if (nowMs - lastUiUpdateMs > 100) {
+      if (!gameOver && nowMs - lastUiUpdateMs > 100) {
         updateTime(nowMs);
         lastUiUpdateMs = nowMs;
       }
