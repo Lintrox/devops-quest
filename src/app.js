@@ -113,8 +113,26 @@ if (!canvas) {
   }
 }
 
-if score += 1
-   player.width += 4
+// Lorsque le joueur monte de niveau, on augmente aussi son rayon
+const originalLevelUp = player.speed + 0.4; // pour repère, mais on changera dans le code plus haut
+
+// Tu dois chercher dans le code existant là où il y a `if (state.score % 50 === 0)` (dans la fonction update).
+// Ajoute dedans après l'augmentation de level :
+      // Par exemple : 
+      // player.speed += 0.4;
+      // player.r += 2; // <- AJOUTE cette ligne pour agrandir le joueur à chaque niveau (2 px en plus à chaque fois)
+      // log(`🎉 Level Up! Niveau ${state.level}`);
 
 
-   
+// Ou si tu veux juste une version patch à ajouter ici
+// — version qui intercepte l'augmentation de niveau (si tu peux modifier la fonction update) :
+
+/*
+Remarque :  
+Si tu ne peux pas modifier dans la boucle du jeu, alors ce patch n'a d'effet que si réutilisé dans la logique principale.  
+Mais le vrai changement doit être :  
+      player.speed += 0.4;
+      player.r += 2; // <--- AJOUTE cette ligne
+      log(`🎉 Level Up! Niveau ${state.level}`);
+*/
+
