@@ -33,8 +33,10 @@ if (!canvas) {
     // Game state
     const state = { score: 0, level: 1 };
 
-    const player = { x: 80, y: 80, r: 14, speed: 3.2 };
+    const BASE_PLAYER_SPEED = 3.2;
+    const player = { x: 80, y: 80, r: 14, speed: BASE_PLAYER_SPEED };
     let star = spawnStar();
+    let touchingEdge = false;
 
     // Timer par niveau
     let levelStartMs = performance.now();
@@ -65,6 +67,16 @@ if (!canvas) {
       if (timeEl) timeEl.textContent = `Time: ${elapsedSec.toFixed(1)}s`;
     }
 
+    function resetLevelOne(nowMs) {
+      const ts = nowMs ?? performance.now();
+      state.level = 1;
+      player.speed = BASE_PLAYER_SPEED;
+      levelStartMs = ts;
+      updateHUD();
+      updateTime(ts);
+      log("↩️ Bord touché : retour au niveau 1");
+    }
+
     function update(nowMs) {
       const up = keys.has("arrowup") || keys.has("z");
       const down = keys.has("arrowdown") || keys.has("s");
@@ -78,6 +90,17 @@ if (!canvas) {
 
       player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x));
       player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y));
+
+      const isTouchingEdge =
+        player.x <= player.r ||
+        player.x >= canvas.width - player.r ||
+        player.y <= player.r ||
+        player.y >= canvas.height - player.r;
+
+      if (isTouchingEdge && !touchingEdge) {
+        resetLevelOne(nowMs);
+      }
+      touchingEdge = isTouchingEdge;
 
       // Collision joueur-étoile
       if (dist(player, star) < player.r + star.r) {
