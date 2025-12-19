@@ -35,7 +35,7 @@ if (!canvas) {
 
     const BASE_PLAYER_SPEED = 3.2;
     const BASE_STAR_RADIUS = 10;
-    const STAR_SHRINK_STEP = 2;
+    const STAR_SHRINK_STEP = 8;
     const STAR_GROW_STEP = 2;
     const MIN_STAR_RADIUS = 4;
     const MAX_STAR_RADIUS = 22;
