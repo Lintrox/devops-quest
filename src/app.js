@@ -165,9 +165,10 @@ if (!canvas) {
     }
 
     function updateTime(nowMs) {
-      if (!started || levelStartMs === null) return;
+      if (!started || gameOver) return;
+      if (levelStartMs === null) levelStartMs = nowMs;
       const elapsedSec = (nowMs - levelStartMs) / 1000;
-      if (timeEl) timeEl.textContent = `Time: ${elapsedSec.toFixed(1)}s`;
+      if (timeEl) timeEl.textContent = `Temps: ${elapsedSec.toFixed(1)}s`;
     }
 
     function resetLevelOne(nowMs) {
@@ -328,7 +329,7 @@ if (!canvas) {
       started = false;
       setButtonRunning(false);
       updateHUD();
-      if (timeEl) timeEl.textContent = "Time: 0.0s";
+      if (timeEl) timeEl.textContent = "Temps: 0.0s";
     }
 
     function startGame() {
@@ -337,6 +338,7 @@ if (!canvas) {
       gameStartMs = now;
       levelStartMs = now;
       lastUiUpdateMs = now;
+      gameOver = false;
       started = true;
       setButtonRunning(true);
       updateHUD();
@@ -366,7 +368,7 @@ if (!canvas) {
     });
 
     updateHUD();
-    if (timeEl) timeEl.textContent = "Time: 0.0s";
+      if (timeEl) timeEl.textContent = "Temps: 0.0s";
     setButtonRunning(false);
     loop();
   }
