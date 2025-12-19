@@ -38,10 +38,12 @@ if (!canvas) {
     const STAR_SHRINK_STEP = 4;
     const MIN_STAR_RADIUS = 4;
     const MAX_LEVEL = 10;
+    const EDGE_FLASH_MS = 400;
     let starRadius = BASE_STAR_RADIUS;
     const player = { x: 80, y: 80, r: 14, speed: BASE_PLAYER_SPEED };
     let star = spawnStar();
     let touchingEdge = false;
+    let edgeFlashTimeout = null;
 
     // Timer par niveau
     let gameStartMs = performance.now();
@@ -90,6 +92,15 @@ if (!canvas) {
       log("↩️ Bord touché : retour au niveau 1");
     }
 
+    function flashEdgeBorder() {
+      canvas.classList.add("edge-flash");
+      if (edgeFlashTimeout) clearTimeout(edgeFlashTimeout);
+      edgeFlashTimeout = window.setTimeout(() => {
+        canvas.classList.remove("edge-flash");
+        edgeFlashTimeout = null;
+      }, EDGE_FLASH_MS);
+    }
+
     function finishGame(nowMs) {
       gameOver = true;
       const finalTimeSec = (nowMs - gameStartMs) / 1000;
@@ -122,6 +133,7 @@ if (!canvas) {
         player.y >= canvas.height - player.r;
 
       if (isTouchingEdge && !touchingEdge) {
+        flashEdgeBorder();
         resetLevelOne(nowMs);
       }
       touchingEdge = isTouchingEdge;

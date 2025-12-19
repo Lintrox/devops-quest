@@ -7,5 +7,6 @@ body { margin: 0; background: #0b0f14; color: #e8f0ff; display: grid; place-item
 .stats { display: flex; gap: 14px; opacity: .95; flex-wrap: wrap; justify-content: flex-end; }
 .panel { padding: 14px 16px 16px; background: #0f151f; }
 canvas { width: 100%; height: auto; background: #0b0f14; border: 1px solid #2c3a4a; border-radius: 12px; display: block; margin-top: 10px; }
+.edge-flash { border-color: #ff4d4d; box-shadow: 0 0 0 2px rgba(255,77,77,0.3); }
 .log { margin-top: 12px; padding: 10px; border: 1px dashed #2c3a4a; border-radius: 10px; min-height: 70px; background: #0b0f14; }
 .footer { padding: 12px 16px; background: #121a24; opacity: .9; }
