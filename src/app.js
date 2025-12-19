@@ -169,8 +169,8 @@ if (!canvas) {
 
     function updateTime(nowMs) {
       if (!started || gameOver) return;
-      if (levelStartMs === null) levelStartMs = nowMs;
-      const elapsedSec = (nowMs - levelStartMs) / 1000;
+      if (gameStartMs === null) gameStartMs = nowMs;
+      const elapsedSec = (nowMs - gameStartMs) / 1000;
       if (timeEl) timeEl.textContent = `Temps: ${elapsedSec.toFixed(1)}s`;
     }
 
