@@ -112,3 +112,8 @@ if (!canvas) {
     loop();
   }
 }
+
+
+if score += 1
+   player.width += 0,5
+   
