@@ -107,7 +107,7 @@ if (!canvas) {
     }
 
     updateHUD();
-    log("✅ Jeu lancé. Déplace toi avec les flèches.");
+    log("✅ Jeu lancé.");
     loop();
   }
 }
