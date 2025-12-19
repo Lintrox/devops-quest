@@ -40,7 +40,7 @@ function update() {
   
   // Changer la couleur de fond en fonction du niveau
   if (level === 1) {
-    document.body.style.backgroundColor = "#1a1a2e";
+    document.body.style.backgroundColor = "#f710aa";
   } else if (level === 2) {
     document.body.style.backgroundColor = "#16213e";
   } else if (level === 3) {
