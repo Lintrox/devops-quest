@@ -57,40 +57,92 @@ if (!canvas) {
       return Math.sqrt(dx * dx + dy * dy);
     }
 
-    function drawPacman(ctx, x, y, r, nowMs) {
+    function drawBulldog(ctx, x, y, r, nowMs) {
       const t = nowMs ?? performance.now();
-      const pulse = Math.abs(Math.sin(t / 240));
-      const mouth = 0.2 * Math.PI + 0.25 * Math.PI * pulse;
-      const start = mouth;
-      const end = Math.PI * 2 - mouth;
+      const bob = Math.sin(t / 240) * r * 0.03;
+
+      // face
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.arc(x, y, r, start, end);
-      ctx.closePath();
-      ctx.fillStyle = "#ffd54f";
+      ctx.arc(x, y + bob, r, 0, Math.PI * 2);
+      ctx.fillStyle = "#d89b59";
+      ctx.fill();
+
+      // ears
+      ctx.fillStyle = "#c07f3f";
+      ctx.beginPath();
+      ctx.moveTo(x - r * 0.6, y - r * 0.2 + bob);
+      ctx.quadraticCurveTo(x - r * 0.9, y - r * 0.9 + bob, x - r * 0.3, y - r * 0.6 + bob);
+      ctx.quadraticCurveTo(x - r * 0.45, y - r * 0.3 + bob, x - r * 0.6, y - r * 0.2 + bob);
       ctx.fill();
 
       ctx.beginPath();
-      ctx.arc(x + r * 0.2, y - r * 0.35, r * 0.12, 0, Math.PI * 2);
-      ctx.fillStyle = "#0b0f14";
+      ctx.moveTo(x + r * 0.6, y - r * 0.2 + bob);
+      ctx.quadraticCurveTo(x + r * 0.9, y - r * 0.9 + bob, x + r * 0.3, y - r * 0.6 + bob);
+      ctx.quadraticCurveTo(x + r * 0.45, y - r * 0.3 + bob, x + r * 0.6, y - r * 0.2 + bob);
       ctx.fill();
+
+      // muzzle
+      ctx.beginPath();
+      ctx.ellipse(x, y + r * 0.25 + bob, r * 0.55, r * 0.4, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "#f0d5b0";
+      ctx.fill();
+
+      // nose
+      ctx.beginPath();
+      ctx.ellipse(x, y + r * 0.1 + bob, r * 0.18, r * 0.12, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "#1a1a1a";
+      ctx.fill();
+
+      // eyes
+      ctx.fillStyle = "#0b0f14";
+      ctx.beginPath();
+      ctx.arc(x - r * 0.35, y - r * 0.1 + bob, r * 0.12, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.35, y - r * 0.1 + bob, r * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // brows
+      ctx.strokeStyle = "#0b0f14";
+      ctx.lineWidth = r * 0.08;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(x - r * 0.5, y - r * 0.25 + bob);
+      ctx.lineTo(x - r * 0.2, y - r * 0.2 + bob);
+      ctx.moveTo(x + r * 0.5, y - r * 0.25 + bob);
+      ctx.lineTo(x + r * 0.2, y - r * 0.2 + bob);
+      ctx.stroke();
+
+      // mouth lines
+      ctx.lineWidth = r * 0.06;
+      ctx.beginPath();
+      ctx.moveTo(x - r * 0.12, y + r * 0.32 + bob);
+      ctx.lineTo(x + r * 0.12, y + r * 0.32 + bob);
+      ctx.moveTo(x, y + r * 0.32 + bob);
+      ctx.lineTo(x, y + r * 0.48 + bob);
+      ctx.stroke();
     }
 
-    function drawCheese(ctx, x, y, r) {
-      ctx.fillStyle = "#f4b400";
+    function drawKibble(ctx, x, y, r) {
+      const size = r * 0.9;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.PI / 8);
       ctx.beginPath();
-      ctx.moveTo(x - r, y + r * 0.85);
-      ctx.lineTo(x + r, y + r * 0.85);
-      ctx.lineTo(x + r * 1.15, y - r * 0.6);
+      ctx.moveTo(-size, 0);
+      ctx.quadraticCurveTo(-size, -size, 0, -size);
+      ctx.quadraticCurveTo(size, -size, size, 0);
+      ctx.quadraticCurveTo(size, size, 0, size);
+      ctx.quadraticCurveTo(-size, size, -size, 0);
       ctx.closePath();
+      ctx.fillStyle = "#b26a28";
       ctx.fill();
 
-      ctx.fillStyle = "rgba(255, 241, 166, 0.9)";
       ctx.beginPath();
-      ctx.arc(x - r * 0.3, y + r * 0.3, r * 0.18, 0, Math.PI * 2);
-      ctx.arc(x + r * 0.25, y + r * 0.15, r * 0.14, 0, Math.PI * 2);
-      ctx.arc(x + r * 0.4, y - r * 0.25, r * 0.12, 0, Math.PI * 2);
+      ctx.arc(-size * 0.2, -size * 0.15, size * 0.16, 0, Math.PI * 2);
+      ctx.arc(size * 0.15, size * 0.05, size * 0.12, 0, Math.PI * 2);
+      ctx.arc(-size * 0.05, size * 0.2, size * 0.1, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.25)";
       ctx.fill();
+      ctx.restore();
     }
 
     function updateHUD() {
@@ -225,11 +277,11 @@ if (!canvas) {
     function draw(nowMs) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // cheese
-      drawCheese(ctx, star.x, star.y, star.r);
+      // kibble
+      drawKibble(ctx, star.x, star.y, star.r);
 
-      // pacman
-      drawPacman(ctx, player.x, player.y, player.r, nowMs);
+      // bulldog
+      drawBulldog(ctx, player.x, player.y, player.r, nowMs);
 
       ctx.fillStyle = "rgba(255,255,255,0.75)";
       ctx.font = "14px monospace";
