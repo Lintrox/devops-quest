@@ -67,18 +67,20 @@ if (!canvas) {
       ctx.fillStyle = "#d89b59";
       ctx.fill();
 
-      // ears
+      // ears (pointed, upright)
       ctx.fillStyle = "#c07f3f";
       ctx.beginPath();
-      ctx.moveTo(x - r * 0.6, y - r * 0.2 + bob);
-      ctx.quadraticCurveTo(x - r * 0.9, y - r * 0.9 + bob, x - r * 0.3, y - r * 0.6 + bob);
-      ctx.quadraticCurveTo(x - r * 0.45, y - r * 0.3 + bob, x - r * 0.6, y - r * 0.2 + bob);
+      ctx.moveTo(x - r * 0.55, y - r * 0.25 + bob);
+      ctx.lineTo(x - r * 0.85, y - r * 1.05 + bob);
+      ctx.lineTo(x - r * 0.25, y - r * 0.55 + bob);
+      ctx.closePath();
       ctx.fill();
 
       ctx.beginPath();
-      ctx.moveTo(x + r * 0.6, y - r * 0.2 + bob);
-      ctx.quadraticCurveTo(x + r * 0.9, y - r * 0.9 + bob, x + r * 0.3, y - r * 0.6 + bob);
-      ctx.quadraticCurveTo(x + r * 0.45, y - r * 0.3 + bob, x + r * 0.6, y - r * 0.2 + bob);
+      ctx.moveTo(x + r * 0.55, y - r * 0.25 + bob);
+      ctx.lineTo(x + r * 0.85, y - r * 1.05 + bob);
+      ctx.lineTo(x + r * 0.25, y - r * 0.55 + bob);
+      ctx.closePath();
       ctx.fill();
 
       // muzzle
