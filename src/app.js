@@ -229,7 +229,6 @@ if (!canvas) {
 
       ctx.fillStyle = "rgba(255,255,255,0.75)";
       ctx.font = "14px monospace";
-      ctx.fillText("Utilise les flèches pour te déplacer", 14, canvas.height - 14);
     }
 
     function loop(nowMs) {
