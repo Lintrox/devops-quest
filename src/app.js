@@ -43,9 +43,9 @@ if (!canvas) {
     let started = false;
 
     // Timer par niveau
-    let gameStartMs = performance.now();
-    let levelStartMs = gameStartMs;
-    let lastUiUpdateMs = 0;
+    let gameStartMs = null;
+    let levelStartMs = null;
+    let lastUiUpdateMs = null;
     let bestLevelTimeSec = null;
     let bestLevelNumber = null;
     let gameOver = false;
@@ -106,6 +106,7 @@ if (!canvas) {
     }
 
     function updateTime(nowMs) {
+      if (!started || levelStartMs === null) return;
       const elapsedSec = (nowMs - levelStartMs) / 1000;
       if (timeEl) timeEl.textContent = `Time: ${elapsedSec.toFixed(1)}s`;
     }
@@ -116,13 +117,13 @@ if (!canvas) {
       player.speed = BASE_PLAYER_SPEED;
       starRadius = BASE_STAR_RADIUS;
       star.r = starRadius;
-      levelStartMs = ts;
-      gameStartMs = ts;
+      levelStartMs = started ? ts : null;
+      gameStartMs = started ? ts : null;
       bestLevelTimeSec = null;
       bestLevelNumber = null;
       gameOver = false;
       updateHUD();
-      updateTime(ts);
+      if (started) updateTime(ts);
     }
 
     function flashEdgeBorder() {
@@ -136,7 +137,7 @@ if (!canvas) {
 
     function finishGame(nowMs) {
       gameOver = true;
-      const finalTimeSec = (nowMs - gameStartMs) / 1000;
+      const finalTimeSec = gameStartMs === null ? 0 : (nowMs - gameStartMs) / 1000;
       const bestTime = bestLevelTimeSec === null ? null : bestLevelTimeSec.toFixed(2);
       const bestText =
         bestTime && bestLevelNumber ? `Niveau ${bestLevelNumber} en ${bestTime}s` : "Aucun niveau chronométré";
@@ -233,7 +234,7 @@ if (!canvas) {
       update(nowMs);
 
       // Refresh timer UI (max 10 fois/sec)
-      if (started && !gameOver && nowMs - lastUiUpdateMs > 100) {
+      if (started && !gameOver && nowMs - (lastUiUpdateMs ?? 0) > 100) {
         updateTime(nowMs);
         lastUiUpdateMs = nowMs;
       }
@@ -272,6 +273,7 @@ if (!canvas) {
     if (startBtn) startBtn.addEventListener("click", startGame);
 
     updateHUD();
+    if (timeEl) timeEl.textContent = "Time: 0.0s";
     log("✅ Prêt. Appuie sur Start pour lancer.");
     loop();
   }
