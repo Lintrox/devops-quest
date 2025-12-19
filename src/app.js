@@ -97,16 +97,19 @@ if (!canvas) {
       if (levelEl) levelEl.textContent = `Level: ${state.level}`;
     }
 
-    function flashLevel() {
+    function flashLevel(direction) {
       if (!levelEl) return;
-      levelEl.classList.remove("level-flash");
+      const upClass = "level-flash-up";
+      const downClass = "level-flash-down";
+      levelEl.classList.remove(upClass, downClass);
       void levelEl.offsetWidth; // force reflow to restart animation
-      levelEl.classList.add("level-flash");
+      const targetClass = direction === "down" ? downClass : upClass;
+      levelEl.classList.add(targetClass);
       if (levelFlashTimeout) clearTimeout(levelFlashTimeout);
       levelFlashTimeout = window.setTimeout(() => {
-        levelEl.classList.remove("level-flash");
+        levelEl.classList.remove(upClass, downClass);
         levelFlashTimeout = null;
-      }, 600);
+      }, 900);
     }
 
     function updateTime(nowMs) {
@@ -117,7 +120,7 @@ if (!canvas) {
 
     function resetLevelOne(nowMs) {
       const ts = nowMs ?? performance.now();
-      state.level = 1;
+      state.level = 0;
       player.speed = BASE_PLAYER_SPEED;
       starRadius = BASE_STAR_RADIUS;
       star.r = starRadius;
@@ -128,6 +131,7 @@ if (!canvas) {
       gameOver = false;
       updateHUD();
       if (started) updateTime(ts);
+      flashLevel("down");
     }
 
     function flashEdgeBorder() {
@@ -200,7 +204,7 @@ if (!canvas) {
             star.r = starRadius;
           }
 
-          flashLevel();
+          flashLevel("up");
 
           if (state.level === MAX_LEVEL) {
             updateHUD();

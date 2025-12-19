@@ -11,10 +11,16 @@ body { margin: 0; background: #0b0f14; color: #e8f0ff; display: grid; place-item
 .start-btn.stop:active { box-shadow: 0 8px 18px rgba(255,95,109,0.26); }
 .signature { padding: 6px 10px; border: 1px solid #37506d; border-radius: 12px; color: #8ec5ff; background: rgba(20,32,48,0.7); font-weight: 600; letter-spacing: .2px; }
 .stats { display: flex; gap: 6px; opacity: .95; flex-direction: column; align-items: flex-end; }
-.level-flash { animation: levelFlash 0.5s ease; }
-@keyframes levelFlash {
+.level-flash-up { animation: levelFlashUp 0.2s ease-in-out 0s 3 alternate; }
+.level-flash-down { animation: levelFlashDown 0.2s ease-in-out 0s 3 alternate; }
+@keyframes levelFlashUp {
   0% { color: #ffffff; transform: scale(1); }
-  50% { color: #7fffcc; transform: scale(1.08); }
+  50% { color: #77ff99; transform: scale(1.1); }
+  100% { color: #ffffff; transform: scale(1); }
+}
+@keyframes levelFlashDown {
+  0% { color: #ffffff; transform: scale(1); }
+  50% { color: #ff7b7b; transform: scale(1.08); }
   100% { color: #ffffff; transform: scale(1); }
 }
 .panel { padding: 14px 16px 16px; background: #0f151f; }
