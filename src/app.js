@@ -27,7 +27,8 @@ function update() {
   
   // Changer la couleur de fond en fonction du niveau
   if (level += 1) {
-    document.body.style.backgroundColor = "#1a1a2e";
+    document.body.style.backgroundColor = "#1a1a2e"
+    document.body.style.color = "#e8f0ff";
   } else if (level % 2 === 0) {
     document.body.style.backgroundColor = "#16213e"
     log('waouw! Quel niveau!');
@@ -51,7 +52,6 @@ if (xp % 30 === 0) {
   }
   update();
 });
-
 document.getElementById("btnDeploy").addEventListener("click", async () => {
   log("Déploiement simulé… ⚙️");
   await new Promise(r => setTimeout(r, 600));
