@@ -34,6 +34,10 @@ if (!canvas) {
     const state = { score: 0, level: 1 };
 
     const BASE_PLAYER_SPEED = 3.2;
+    const BASE_STAR_RADIUS = 10;
+    const STAR_SHRINK_STEP = 2;
+    const MIN_STAR_RADIUS = 4;
+    let starRadius = BASE_STAR_RADIUS;
     const player = { x: 80, y: 80, r: 14, speed: BASE_PLAYER_SPEED };
     let star = spawnStar();
     let touchingEdge = false;
@@ -47,7 +51,7 @@ if (!canvas) {
       return {
         x: padding + Math.random() * (canvas.width - 2 * padding),
         y: padding + Math.random() * (canvas.height - 2 * padding),
-        r: 10,
+        r: starRadius,
       };
     }
 
@@ -71,6 +75,8 @@ if (!canvas) {
       const ts = nowMs ?? performance.now();
       state.level = 1;
       player.speed = BASE_PLAYER_SPEED;
+      starRadius = BASE_STAR_RADIUS;
+      star.r = starRadius;
       levelStartMs = ts;
       updateHUD();
       updateTime(ts);
@@ -105,7 +111,6 @@ if (!canvas) {
       // Collision joueur-étoile
       if (dist(player, star) < player.r + star.r) {
         state.score += 10;
-        log("⭐ Étoile ramassée (+10)");
         star = spawnStar();
 
         // Level up toutes les 50 points
@@ -114,6 +119,12 @@ if (!canvas) {
 
           state.level += 1;
           player.speed += 0.4;
+
+          if (state.level % 10 === 0 && starRadius > MIN_STAR_RADIUS) {
+            starRadius = Math.max(MIN_STAR_RADIUS, starRadius - STAR_SHRINK_STEP);
+            star.r = starRadius;
+            log(`✨ Niveau ${state.level}: étoile rétrécie`);
+          }
 
           log(`🎉 Level Up! Niveau ${state.level} (temps: ${levelTimeSec.toFixed(2)}s)`);
 
