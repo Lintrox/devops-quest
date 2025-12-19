@@ -1,6 +1,5 @@
 const canvas = document.getElementById("game");
 const logEl = document.getElementById("log");
-const scoreEl = document.getElementById("score");
 const levelEl = document.getElementById("level");
 const timeEl = document.getElementById("time");
 const buildEl = document.getElementById("build");
@@ -68,7 +67,6 @@ if (!canvas) {
     }
 
     function updateHUD() {
-      if (scoreEl) scoreEl.textContent = `Score: ${state.score}`;
       if (levelEl) levelEl.textContent = `Level: ${state.level}`;
     }
 
