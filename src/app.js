@@ -354,6 +354,18 @@ if (!canvas) {
 
     if (startBtn) startBtn.addEventListener("click", toggleStart);
 
+    // Start/Stop via clavier : Entrée (start/toggle), Échap (stop)
+    window.addEventListener("keydown", (e) => {
+      if (e.repeat) return;
+      if (e.key === "Enter") {
+        e.preventDefault();
+        toggleStart();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        if (started) resetToIdle();
+      }
+    });
+
     updateHUD();
     if (timeEl) timeEl.textContent = "Time: 0.0s";
     setButtonRunning(false);
