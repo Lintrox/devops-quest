@@ -69,7 +69,6 @@ if (!canvas) {
 
       if (dist(player, star) < player.r + star.r) {
         state.score += 10;
-        log("⭐ Étoile ramassée (+10)");
         star = spawnStar();
 
         if (state.score % 50 === 0) {
