@@ -65,6 +65,42 @@ if (!canvas) {
       return Math.sqrt(dx * dx + dy * dy);
     }
 
+    function drawPacman(ctx, x, y, r, nowMs) {
+      const t = nowMs ?? performance.now();
+      const pulse = Math.abs(Math.sin(t / 240));
+      const mouth = 0.2 * Math.PI + 0.25 * Math.PI * pulse;
+      const start = mouth;
+      const end = Math.PI * 2 - mouth;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.arc(x, y, r, start, end);
+      ctx.closePath();
+      ctx.fillStyle = "#ffd54f";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(x + r * 0.2, y - r * 0.35, r * 0.12, 0, Math.PI * 2);
+      ctx.fillStyle = "#0b0f14";
+      ctx.fill();
+    }
+
+    function drawCheese(ctx, x, y, r) {
+      ctx.fillStyle = "#f4b400";
+      ctx.beginPath();
+      ctx.moveTo(x - r, y + r * 0.85);
+      ctx.lineTo(x + r, y + r * 0.85);
+      ctx.lineTo(x + r * 1.15, y - r * 0.6);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(255, 241, 166, 0.9)";
+      ctx.beginPath();
+      ctx.arc(x - r * 0.3, y + r * 0.3, r * 0.18, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.25, y + r * 0.15, r * 0.14, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.4, y - r * 0.25, r * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     function updateHUD() {
       if (levelEl) levelEl.textContent = `Level: ${state.level}`;
     }
@@ -179,20 +215,14 @@ if (!canvas) {
       }
     }
 
-    function draw() {
+    function draw(nowMs) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // star
-      ctx.beginPath();
-      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-      ctx.fillStyle = "#ffd166";
-      ctx.fill();
+      // cheese
+      drawCheese(ctx, star.x, star.y, star.r);
 
-      // player
-      ctx.beginPath();
-      ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
-      ctx.fillStyle = "#4cc9f0";
-      ctx.fill();
+      // pacman
+      drawPacman(ctx, player.x, player.y, player.r, nowMs);
 
       ctx.fillStyle = "rgba(255,255,255,0.75)";
       ctx.font = "14px monospace";
@@ -208,7 +238,7 @@ if (!canvas) {
         lastUiUpdateMs = nowMs;
       }
 
-      draw();
+      draw(nowMs);
       requestAnimationFrame(loop);
     }
 
