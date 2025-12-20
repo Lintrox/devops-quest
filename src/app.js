@@ -2,7 +2,6 @@ const canvas = document.getElementById("game");
 const levelEl = document.getElementById("level");
 const timeEl = document.getElementById("time");
 const startBtn = document.getElementById("start-btn");
-const shareBtn = document.getElementById("share-btn");
 
 function log() {} // logging désactivé (zone log supprimée)
 
@@ -222,7 +221,7 @@ if (!canvas) {
       const bestText =
         bestTime && bestLevelNumber ? `Niveau ${bestLevelNumber} en ${bestTime}s` : "Aucun niveau chronométré";
       if (timeEl) timeEl.textContent = `Temps final: ${finalTimeSec.toFixed(2)}s`;
-      setShareVisible(true);
+      // end of game: stay stopped
     }
 
     function update(nowMs) {
@@ -326,22 +325,6 @@ if (!canvas) {
       startBtn.classList.toggle("stop", isRunning);
     }
 
-    function setShareVisible(show) {
-      if (!shareBtn) return;
-      shareBtn.style.display = show ? "inline-flex" : "none";
-    }
-
-    function downloadCanvasSnapshot() {
-      if (!canvas) return;
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "lazy-quest-score.png";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
     function resetToIdle() {
       state.score = 0;
       state.level = 1;
@@ -365,7 +348,6 @@ if (!canvas) {
       started = false;
       cheatBuffer = "";
       setButtonRunning(false);
-      setShareVisible(false);
       updateHUD();
       if (timeEl) timeEl.textContent = "Temps: 0.0s";
     }
@@ -392,7 +374,6 @@ if (!canvas) {
     }
 
     if (startBtn) startBtn.addEventListener("click", toggleStart);
-    if (shareBtn) shareBtn.addEventListener("click", downloadCanvasSnapshot);
 
     // Start/Stop via clavier : Entrée (start/toggle), Échap (stop)
     window.addEventListener("keydown", (e) => {
@@ -409,7 +390,6 @@ if (!canvas) {
     updateHUD();
     if (timeEl) timeEl.textContent = "Temps: 0.0s";
     setButtonRunning(false);
-    setShareVisible(false);
     loop();
   }
 }

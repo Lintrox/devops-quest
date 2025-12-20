@@ -12,9 +12,6 @@ body { margin: 0; background: #0b0f14; color: #e8f0ff; display: grid; place-item
 .start-btn.stop { background: linear-gradient(135deg,#ff5f6d,#ff884d); box-shadow: 0 10px 22px rgba(255,95,109,0.28); }
 .start-btn.stop:hover { box-shadow: 0 12px 26px rgba(255,95,109,0.36); }
 .start-btn.stop:active { box-shadow: 0 8px 18px rgba(255,95,109,0.26); }
-.share-btn { background: linear-gradient(135deg,#4fc3f7,#2a7de1); color: #0b0f14; border: none; border-radius: 12px; padding: 10px 14px; font-weight: 750; cursor: pointer; box-shadow: 0 8px 18px rgba(74,144,226,0.25); transition: transform 120ms ease, box-shadow 120ms ease; min-width: 110px; text-transform: uppercase; letter-spacing: .35px; }
-.share-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(74,144,226,0.32); }
-.share-btn:active { transform: translateY(0); box-shadow: 0 7px 16px rgba(74,144,226,0.26); }
 .signature { padding: 6px 10px; border: 1px solid #37506d; border-radius: 12px; color: #8ec5ff; background: rgba(20,32,48,0.7); font-weight: 600; letter-spacing: .2px; }
 .stats { display: flex; gap: 6px; opacity: .95; flex-direction: column; align-items: flex-end; }
 .level-flash-up { animation: levelFlashUp 0.35s ease-in-out 0s 3 alternate; }
